@@ -270,6 +270,145 @@
                     </standard-slide-content>
                 </section>
 
+                <section data-auto-animate>
+                    <h1>Temporal Coupling</h1>
+                    <standard-slide-content>
+                        <div style="height: 30%;">
+                            <img src="assets/fsi_mok_model.svg"/>
+                        </div>
+                        <div style="width: 100%; margin-top: 5%;">
+                            Explicit temporal - explicit physical
+                            <hr data-id="temporal-coupling-hr"/>
+                        </div>
+                        <div style="display: flex;
+                                    align-items: center;
+                                    align-content: center;
+                                    justify-items: center;
+                                    justify-content: center;
+                                    width: 100%;"
+                              class="r-stack">
+                            <div style="display: flex;
+                                        flex-direction: row;
+                                        align-items: center;
+                                        align-content: center;
+                                        justify-items: center;
+                                        justify-content: center;
+                                        width: 100%;">
+                                <ol start="0">
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="0">Begin from equilibrium</li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="1">Solve <span style="color: #e37222;">slow partition</span></li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="2">Interpolate <span style="color: #e37222;">slow partition</span></li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="3"><span style="color: #a2ad00;">Transfer</span> interpolated to the <span style="color: #005293;">fast partition</span></li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="4">Solve <span style="color: #005293;">fast partition</span></li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="5"><span style="color: #a2ad00;">Transfer</span> and <span style="color: #005293;">solve</span></li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="6"><span style="color: #a2ad00;">Transfer</span> and <span style="color: #005293;">solve</span></li>
+                                    <li class="fragment fade-in-then-semi-out" data-fragment-index="7"><span style="color: #a2ad00;">Transfer</span> to <span style="color: #e37222;">slow partition</span></li>
+                                </ol>
+                                <div class="r-stack" style="width: 60%; margin-left: 10px;">
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="0"  src="assets/explicit_temporal_explicit_physical_0.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="1"  src="assets/explicit_temporal_explicit_physical_1.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="2"  src="assets/explicit_temporal_explicit_physical_2.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="3"  src="assets/explicit_temporal_explicit_physical_3.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="4"  src="assets/explicit_temporal_explicit_physical_4.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="5"  src="assets/explicit_temporal_explicit_physical_5.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="6"  src="assets/explicit_temporal_explicit_physical_6.svg"/>
+                                    <img style="transition: none; width: 60%;" class="fragment current-visible" data-fragment-index="7"  src="assets/explicit_temporal_explicit_physical_7.svg"/>
+                                    <img style="transition: none;" class="fragment" data-fragment-index="8"  src="assets/solver"/>
+                                </div>
+                            </div>
+                        </div>
+                    </standard-slide-content>
+                </section>
+
+                <section data-auto-animate>
+                    <h1>Temporal Coupling</h1>
+                    <standard-slide-content>
+                        <div style="height: 30%;">
+                            <img src="assets/fsi_mok_model.svg"/>
+                        </div>
+                        <div style="width: 100%; margin-top: 5%;">
+                            Explicit temporal - implicit physical
+                            <hr data-id="temporal-coupling-hr"/>
+                        </div>
+                        <div style="display: flex;
+                                    align-items: center;
+                                    align-content: center;
+                                    justify-items: center;
+                                    justify-content: center;
+                                    width: 100%;">
+                            <div style="display: flex;
+                                        flex-direction: row;
+                                        align-items: center;
+                                        align-content: center;
+                                        justify-items: center;
+                                        justify-content: center;
+                                        width: 100%;">
+                                <ol start="0">
+                                    <li style="opacity: 50%;">Begin from equilibrium</li>
+                                    <li style="opacity: 50%;">Solve <span style="color: #e37222;">slow partition</span></li>
+                                    <li style="opacity: 50%;">Interpolate <span style="color: #e37222;">slow partition</span></li>
+                                    <li style="opacity: 50%;"><span style="color: #a2ad00;">Transfer</span> interpolated to the <span style="color: #005293;">fast partition</span></li>
+                                    <li style="opacity: 50%;">Solve <span style="color: #005293;">fast partition</span></li>
+                                    <li style="opacity: 50%;"><span style="color: #a2ad00;">Transfer</span> and <span style="color: #005293;">solve</span></li>
+                                    <li style="background-color: #eeeeee"><span style="color: #a2ad00;">Implicit physical coupling</span></li>
+                                </ol>
+                                <div class="r-stack" style="width: 60%; margin-left: 10px;">
+                                    <img style="width: 60%;" class="fragment fade-out" data-fragment-index="0" src="assets/explicit_temporal_implicit_physical_6.svg"/>
+                                    <img class="fragment current-visible" data-fragment-index="0" src="assets/solver"/>
+                                </div>
+                            </div>
+                        </div>
+                    </standard-slide-content>
+                </section>
+
+                <section data-auto-animate>
+                    <h1>Temporal Coupling</h1>
+                    <standard-slide-content>
+                        <div style="height: 30%;">
+                            <img src="assets/fsi_mok_model.svg"/>
+                        </div>
+                        <div style="width: 100%; margin-top: 5%;">
+                            Implicit temporal - implicit physical
+                            <hr data-id="temporal-coupling-hr"/>
+                        </div>
+                        <div style="display: flex;
+                                    align-items: center;
+                                    align-content: center;
+                                    justify-items: center;
+                                    justify-content: center;
+                                    width: 100%;">
+                            <div style="display: flex;
+                                        flex-direction: row;
+                                        align-items: center;
+                                        align-content: center;
+                                        justify-items: center;
+                                        justify-content: center;
+                                        width: 100%;">
+                                <div style="display: flex; flex-direction:column; justify-content: left; justify-items: left;">
+                                    <ol start="0">
+                                        <li style="opacity: 50%;">Begin from equilibrium</li>
+                                        <li style="opacity: 50%;">Solve <span style="color: #e37222;">slow partition</span></li>
+                                    </ol>
+                                    <div style="border: 2px dashed #aaaaaa; width: 100%; position: relative;">
+                                        <div style="position: absolute; top: 0; right: 0; background-color: #aaaaaa; color: #ffffff; border: 1px solid #aaaaaa;">loop</div>
+                                        <ol start="2">
+                                            <li>Interpolate <span style="color: #e37222;">slow partition</span></li>
+                                            <li><span style="color: #a2ad00;">Transfer</span> interpolated to the <span style="color: #005293;">fast partition</span></li>
+                                            <li>Solve <span style="color: #005293;">fast partition</span></li>
+                                            <li><span style="color: #a2ad00;">Transfer</span> and <span style="color: #005293;">solve</span></li>
+                                            <li><span style="color: #a2ad00;">Implicit physical coupling</span></li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div style="width: 60%; margin-left: 10px;">
+                                    <img style="width: 60%;" src="assets/implicit_temporal_implicit_physical_6.svg"/>
+                                    <!--<img class="fragment current-visible" data-fragment-index="0" src="assets/solver"/>-->
+                                </div>
+                            </div>
+                        </div>
+                    </standard-slide-content>
+                </section>
+
                 <!-- ================ SLIDES END ================ -->
             </div>
         </div>
