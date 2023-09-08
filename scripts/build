@@ -1,0 +1,41 @@
+#!/bin/bash
+
+script_dir="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+assets_dir="$(dirname "${script_dir}")/assets"
+
+cd "$script_dir"
+
+delete_misc() {
+    for suffix in "aux" "dvi" "log"; do
+        for f in *.$suffix; do
+            rm "$f"
+        done
+    done
+}
+
+while getopts ":c" arg; do
+    case $arg in
+        c)
+            delete_misc
+            exit 0
+            ;;
+        \?)
+            echo "Unsupported argument: ${arg}"
+            exit 1
+    esac
+done
+
+# Generate figures
+for f in *.tex; do
+    for i in 0 1 2; do
+        latex "$f"
+        dvisvgm --no-fonts --page=1-2 "${f%.tex}.dvi"
+    done
+    delete_misc
+done
+
+# Move generated figures to the assets dir
+for f in *.svg; do
+    name="$(basename "${f}")"
+    mv "$f" "${assets_dir}/${name}"
+done

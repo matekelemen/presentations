@@ -1,0 +1,42 @@
+\documentclass{article}
+
+\usepackage[active,tightpage]{preview}
+\usepackage{nicematrix}
+\usepackage{xcolor}
+
+\PreviewEnvironment{align*}
+\begin{document}
+
+\begin{align*}
+    \begin{bNiceMatrix}[margin]
+        \Block[fill=[RGB]{0,82,147}]{2-2}{}
+        \color{white}\textbf{M}^F_{ff} & \color{white}\textbf{M}^F_{fi} & 0 & 0 & 0\\
+        \color{white}\textbf{M}^F_{if} &  \color{white}\textbf{M}^F_{ii} &  0 & 0 & -\textbf{I}^T\\
+        0 & 0 & \Block[fill=[RGB]{227,114,34}]{2-2}{}
+            \color{white}\textbf{M}^S_{ss} & \color{white}\textbf{M}^S_{si} & 0\\
+        0 & 0 & \color{white}\textbf{M}^S_{is} & \color{white}\textbf{M}^S_{ii} & \textbf{T}^T_{SF}\\
+        0 & -\textbf{I} & 0 & \textbf{T}_{SF} & 0
+    \end{bNiceMatrix}
+    \begin{bNiceMatrix}
+        \Block[fill=[RGB]{0,82,147}]{2-1}{}
+        \color{white}\textbf{u}^F_f\\
+        \color{white}\textbf{u}^F_i\\
+        \Block[fill=[RGB]{227,114,34}]{2-1}{}
+        \color{white}\textbf{u}^S_s\\
+        \color{white}\textbf{u}^S_i\\
+        \lambda
+    \end{bNiceMatrix}
+    &=
+    \begin{bNiceMatrix}
+        \Block[fill=[RGB]{0,82,147}]{2-1}{}
+        \color{white}\textbf{r}^F_f\\
+        \color{white}\textbf{r}^F_i\\
+        \Block[fill=[RGB]{227,114,34}]{2-1}{}
+        \color{white}\textbf{r}^S_s\\
+        \color{white}\textbf{r}^S_i\\
+        \textbf{0}
+    \end{bNiceMatrix}\\[0.5em]
+    \textbf{u}^F_i &= \textbf{T}_{SF} \textbf{u}^S_i
+\end{align*}
+
+\end{document}

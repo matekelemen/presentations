@@ -1,0 +1,29 @@
+\documentclass{article}
+
+\usepackage[active,tightpage]{preview}
+\usepackage{nicematrix}
+
+\PreviewEnvironment{align*}
+\begin{document}
+
+\begin{align*}
+    \begin{bNiceMatrix}[margin]
+        \Block[fill=[RGB]{0,82,147}]{2-2}{}
+        \color{white}\textbf{M}^F_{ff} & \color{white}\textbf{M}^F_{fi} & 0\\
+        \color{white}\textbf{M}^F_{if} & \Block[fill=[RGB]{162,173,0}]{2-2}{} \Block[fill=[RGB]{227,114,34}]{1-1}{} \color{white}\textbf{M}^F_{ii} + \color{white}\textbf{M}^S_{ii} &  \color{white}\textbf{M}^S_{is}\\
+        0 & \color{white}\textbf{M}^S_{si} & \color{white}\textbf{M}^S_{ss}
+    \end{bNiceMatrix}
+    \begin{bNiceMatrix}
+        \Block[fill=[RGB]{0,82,147}]{1-1}{} \color{white}\textbf{u}^F_f\\
+        \Block[fill=[RGB]{227,114,34}]{1-1}{} \color{white}{\textbf{u}_i}\\
+        \Block[fill=[RGB]{162,173,0}]{1-1}{} \color{white}\textbf{u}^F_s
+    \end{bNiceMatrix}
+    =
+    \begin{bNiceMatrix}
+        \Block[fill=[RGB]{0,82,147}]{1-1}{} \color{white}\textbf{r}^F_f\\
+        \Block[fill=[RGB]{227,114,34}]{1-1}{} \color{white}{\textbf{r}_i = \textbf{0}}\\
+        \Block[fill=[RGB]{162,173,0}]{1-1}{} \color{white}\textbf{r}^F_s
+    \end{bNiceMatrix}
+\end{align*}
+
+\end{document}
