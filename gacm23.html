@@ -119,7 +119,7 @@
                     <standard-slide-content>
                         <figure class="r-stack" style="width: 100%;">
                             <img class="fragment fade-out" data-fragment-index="0" src="assets/gacm23/fsi_mok_model.svg"/>
-                            <video data-autoplay class="fragment current-visible" data-fragment-index="0" src="assets/gacm23/fsi_mok_paraview.mp4"></video>
+                            <video data-autoplay="1" class="fragment current-visible" data-fragment-index="0" src="assets/gacm23/fsi_mok_paraview.mp4"></video>
                         </figure>
                     </standard-slide-content>
                 </section>
@@ -416,10 +416,30 @@
                     </standard-slide-content>
                 </section>
 
-                <section data-auto-animate>
-                    <h1>Coupling Instability</h1>
-                    <standard-slide-content>
-
+                <section class="r-stack" data-auto-animate>
+                    <h1>Coupling Instabilities</h1>
+                    <standard-slide-content class="fragment" data-fragment-index="0">
+                        <div style="display: flex;
+                                    flex-direction: row;
+                                    align-items: center;
+                                    align-content: center;
+                                    justify-items: center;
+                                    justify-content: center;
+                                    width: 100%;">
+                            <div style="width: 45%;">
+                                <ul>
+                                    <li>No temporal coupling (identical time steps)</li>
+                                    <li>Implicit physical coupling</li>
+                                    <li>Smaller time steps (100 [ms] <span>&#8594;</span> 5 [ms])</li>
+                                </ul>
+                            </div>
+                            <div style="width: 55%;">
+                                <div>
+                                    <img style="width: 60%; margin: 0;" class="fragment" data-fragment-index="0" src="assets/gacm23/mok_unconverged_implicit_5e-3.svg"/>
+                                    <video style="margin: 0; width: 70%;" class="fragment" data-fragment-index="0" data-autoplay="1" src="assets/gacm23/mok_unconverged_implicit.mp4"></video>
+                                </div>
+                            </div>
+                        </div>
                     </standard-slide-content>
                 </section>
 
