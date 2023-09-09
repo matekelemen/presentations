@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>FE ohne Schnee</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/feos23.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+				<!-- ================ SLIDES BEGIN ================ -->
+
+				<section class="opening">
+					<h1>Coupled Systems with Vastly Different Time Scales: Efficient Simulation Strategies and Implementation Aspects</h1>
+					<hr/>
+					<h3>Máté Kelemen</h3>
+					<h3>Institute for Structural Analysis - Technische Universität Braunschweig</h3>
+					<h3>Supervisors: <div>Prof. Dr.-Ing. habil. Roland Wüchner</div><div>Dr.-Ing. Suneth Warnakulasuriya</div></h3>
+					<aside class="notes">
+						Introduction, myself and my supervisors - may be skipped if introduced by the moderator.
+						Explain the layout of the presentation:
+						<ol>
+							<li>Time scale differences in real life</li>
+							<li>Introduce the reference problem I'll be using</li>
+							<li>Incrementally explain the complexities of physical and temporal coupling</li>
+							<li>Explain what kind of new tasks physical and temporal coupling require.</li>
+							<li>Async solver structure</li>
+							<li>Dataset/DatasetTransfer abstractions</li>
+						</ol>
+					</aside>
+				</section>
+
+				<section class="content">
+					<h1 class="title">Problem Statement</h1>
+					<aside class="notes">
+						<ol>
+							<li>physical processes have their own inherent time scales</li>
+							<li>coupled phenomena may often have different scales</li>
+						</ol>
+					</aside>
+					<div class="r-stack">
+						<div class="fragment current-visible" data-fragment-index="0" style="display: flex; align-items: center;">
+							<div style="width: 50%;"><img src="assets/feos23/rusty_bridge.jpg"/></div>
+							<div style="width: 50%;"><img src="assets/feos23/reinforced_concrete_corrosion.jpg"/></div>
+							<aside class="notes">
+								<ol>
+									<li>this is my GRK project</li>
+									<li>chemical processes (corrosion) and dynamic loading</li>
+									<li>positive feedback loop: crack opens => corrosive chemicals enter the structure</li>
+									<li>chemical processes act on a much longer time scale than dynamic loads</li>
+									<li>failure may occur much earlier than predictions based on pure mechanical modeling would approximate</li>
+								</ol>
+							</aside>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="1" style="display: flex; align-items: center;">
+							<figure style="width: 33%;">
+								<img class="cited-image" src="assets/feos23/meteorological_time_scales.png"/>
+								<figcaption>Roland Stull: Practical Meteorology</figcaption>
+							</figure>
+							<figure style="width: 33%;">
+									<img class="cited-image" src="assets/feos23/typhoon.gif"/>
+								<figcaption>Wikimedia: typhoon Mawar</figcaption>
+							</figure>
+							<figure style="width: 33%;">
+									<img class="cited-image" src="assets/feos23/city_wind.gif"/>
+								<figcaption>GrabCad: Wind Field and Pollution Dispersion</figcaption>
+							</figure>
+							<aside class="notes">
+								<ol>
+									<li>Supervisors focus on FSI so fluid example</li>
+									<li>Graph from textbook on meteorological processes</li>
+									<li>Example: meteorological simulations need to capture the influence of the surfaces,
+										which generally have much smaller spatial and temporal scales
+									</li>
+									<li>the rightmost GIF is fake</li>
+								</ol>
+							</aside>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="2" style="display: flex; height: 100%;">
+							<div><video data-autoplay src="assets/feos23/iceberg_fast.mp4"></video></div>
+							<aside class="notes">
+								<ol>
+									<li>Another example: thermodynamics, phase change and dynamics</li>
+									<li>Temperature gradients are rather low</li>
+									<li>freezing/melting occurs slowly,
+										but the backflip resulting from changed center of mass is fast</li>
+								</ol>
+							</aside>
+						</div>
+					</div>
+				</section>
+
+				<section class="content">
+					<h1 class="title">Reference Problem</h1>
+					<aside class="notes">
+						<ol>
+							<li>I need a toy problem to play around with</li>
+							<li>ideal coupled problem; supervisors can help with the physics and coupling</li>
+							<li>temporal scales are comparable, but that means I can generate a reference solution</li>
+						</ol>
+					</aside>
+					<div class="r-stack">
+						<div class="fragment current-visible" data-fragment-index="0">
+							<div><img src="assets/feos23/fsi_mok_model.svg"/></div>
+							<aside class="notes">
+								<ol>
+									<li>the chosen problem is an FSI benchmark case</li>
+									<li>flexible wall in a contracting channel that has a laminarry flowing medium passing through it</li>
+									<li>inlet, outlet, fluid domain, structural domain, interface</li>
+									<li>the wall's density is around the same order of magnitude as the fluid, so the coupling is strong</li>
+								</ol>
+							</aside>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="1" style="display: flex; align-items: center;">
+							<div><video data-autoplay src="assets/feos23/fsi_mok_paraview.mp4"></video></div>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h1 class="title">Reference Problem - Monolithic Model</h1>
+					<div style="display: flex; align-items: center;">
+						<div style="width: 50%;"><img src="assets/feos23/monolithic.svg"/></div>
+						<div style="width: 50%;"><img src="assets/feos23/coupling_monolithic.svg"/></div>
+					</div>
+					<div><img src="assets/feos23/fsi_mok_model.svg"/></div>
+					<aside class="notes">
+						<ol>
+							<li>the most straightforward way to to do coupling is to shove every field variable in one system</li>
+							<li>this is the monolithic physical coupling</li>
+							<li>the solution process is identical to single-field problems: preprocess, advance time, solve system, and postprocess when done</li>
+							<li>result is accurate</li>
+							<li>linear system is huge</li>
+							<li>condition numbers are atrocious due to scale differences (pressures, displacements)</li>
+						</ol>
+					</aside>
+				</section>
+
+				<section>
+					<h1 class="title">Reference Problem - Spatially Partitioned Model</h1>
+					<div style="display: flex; align-items: center;">
+						<div style="width: 70%;"><img src="assets/feos23/partitioned.svg"/></div>
+						<div style="width: 30%;"><img src="assets/feos23/coupling_weak.svg"/></div>
+					</div>
+					<div><img src="assets/feos23/fsi_mok_model.svg"/></div>
+					<aside class="notes">
+						<ol>
+							<li>idea: break partitions into separate systems</li>
+							<li>interface is part of both partitions</li>
+							<li>define a mapping between the two partition's interfaces</li>
+							<li>one possible implementation: perform a fixed point iteration on the interface field</li>
+							<li>fluid partition is solved</li>
+							<li>fluid reactions are mapped onto the interface</li>
+							<li>structure is solved</li>
+							<li>mesh is updated conform to the displaced interface</li>
+							<li>loop until the displacement converges</li>
+						</ol>
+					</aside>
+				</section>
+
+				<section>
+					<h1 class="title">Detour - Multiscale Time Integration</h1>
+					<aside class="notes">
+						<ol>
+							<li>before moving forward, we need to talk about existing approaches for multiscale time integration</li>
+							<li>I'll introduce these methods assuming linear single-field problems (no coupling)</li>
+						</ol>
+					</aside>
+					<div class="r-stack">
+						<div class="fragment current-visible" data-fragment-index="0" style="display: flex; margin: 5px; align-items: center; justify-items: center;">
+							<div style="width: 50%; text-align: left; display: flex; flex-direction: column;">
+								<h3>Subcycling</h3>
+								<ul style="margin: 10px;">
+									<li>interface is part of the slow domain</li>
+									<li>no special treatment of the interface</li>
+									<li>sequential integration</li>
+									<li>interpolate values from the slow domain</li>
+								</ul>
+								<ul style="margin: 10px;">
+									<li>linear interpolation only</li>
+									<li>requires diagonalizable mass matrix</li>
+									<li>conditional stability</li>
+								</ul>
+							</div>
+							<div style="width: 50%; height: 75%;">
+								<img src="assets/feos23/interpolation.svg"/>
+							</div>
+							<aside class="notes">
+								<ol>
+									<li>the most straightfowrad method is subcycling</li>
+									<li>developed for explicit time integration with diagonalizable mass matrices</li>
+									<li>domain is cut into two regions that are integrated with different time steps</li>
+									<li>interface between regions is part of the slow domain</li>
+									<li>slow domain is solved first</li>
+									<li>fast domain needs solution from the interface that doesn't exist => interpolate (linear only)</li>
+								</ol>
+							</aside>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="1" style="display: flex; margin: 5px; align-items: center; justify-items: center;">
+							<div style="width: 50%;">
+								<h3>Waveform Relaxation</h3>
+								<ul style="margin: 10px;">
+									<li>partitioned system matrices</li>
+									<li>iterative solution on the entire time domain</li>
+									<li>no imposed temporal discretization</li>
+									<li>interpolate values from the slow domain</li>
+								</ul>
+								<div style="width: 65%; margin-left: auto; margin-right: auto;">
+									<img src="assets/feos23/wr_partitioning.png"/>
+								</div>
+							</div>
+							<div style="width: 50%;">
+								<div style="display: flex; align-items: center;">
+									<div style="width: 50%; margin-left: 15%; margin-right: 15%;">
+										<img src="assets/feos23/wr_diagonal.png"/>
+									</div>
+									<div style="width: 50%; margin-left: 15%; margin-right: 15%;">
+										<img src="assets/feos23/wr_sequential.png"/>
+									</div>
+								</div>
+								<figure>
+									<img src="assets/feos23/waveform_relaxation_figure.png"/>
+									<figcaption style="color: rgba(0,0,0,0.35)">Pasetto, Waisman, Chen: A Waveform Newmark Relaxation Method for Structural Dynamics Problems​</figcaption>
+								</figure>
+							</div>
+							<aside class="notes">
+								<ol>
+									<li>another approach is waveform relaxation, originally developed for the analysis of electrical circuits</li>
+									<li>formulation is based on the semi-discretized form</li>
+									<li>system matrices are broken into a sum (goal is to have the '+' component in a form that allows decoupling the linear system)</li>
+									<li>the '-' components are lagging one iteration behind</li>
+									<li>parts (or the entirety) of the system become decoupled => each decoupled partition can be solved independently with their own temporal scheme</li>
+									<li>perform a fixed point iteration until the the '+' and '-' components converge</li>
+									<li>no temporal discretization imposed</li>
+									<li>if finite differences => stability and accuracy properties of the scheme are inherited</li>
+								</ol>
+							</aside>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h1 class="title">Reference Problem - Spatially-Temporally Partitioned Model</h1>
+					<div class="r-stack" style="display: flex; align-items: center;">
+						<div style="width: 85%;">
+							<div style="height: 50%;"><img src="assets/feos23/hierarchical.svg"/></div>
+							<div style="height: 50%;"><img src="assets/feos23/fsi_mok_model.svg"/></div>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="0" style="width: 15%;">
+							<div style="display: flex; align-items: center;"><img src="assets/feos23/interpolation.svg"/></div>
+						</div>
+					</div>
+					<aside class="notes">
+						<ol>
+							<li>physical and temporal partitioning complicates the solution process</li>
+							<li>attempt to represent the solution flow with generalized abstractions (unified framework for all schemes)</li>
+							<li>slow partition keeps advancing in time until a predicate fires and coupling (synchronization) is requested</li>
+							<li>information required by the fast partition is fetched from the slow partition (only last step: weak temporal coupling, all steps: strong temporal coupling)</li>
+							<li>fast partition advances until it reaches the coupling time</li>
+							<li>information required by the slow partition (displacements) is fetched from the fast partition</li>
+							<li>additionally, time may be reset to the previous slow time step to perform fixed point iterations</li>
+						</ol>
+					</aside>
+				</section>
+
+				<section>
+					<h1 class="title">Tasks</h1>
+					<div>
+						<img src="assets/feos23/hierarchical.svg"/>
+					</div>
+					<aside class="notes">
+						<ol>
+							<li>my goal is to create a generic solver with universal abstractions that can handle every operation required by physical and temporal coupling</li>
+							<li>let's collect all these operations that occured</li>
+						</ol>
+					</aside>
+					<div class="r-stack">
+						<div class="fragment current-visible" data-fragment-index="0" style="display: flex;">
+							<div style="width: 50%;">
+								<ol style="list-style-type: lower-alpha;">
+									<li>Advance partition state (solve and step/relax)</li>
+									<li>Map data between partitions</li>
+									<li>Accelerate coupling convergence</li>
+									<li>Access earlier states</li>
+									<li>Interpolate interface state</li>
+								</ol>
+							</div>
+							<div style="width: 50%;">
+								<img src="assets/feos23/data_access.svg"/>
+							</div>
+							<aside class="notes">
+								<ol>
+									<li>first of all, we need to tell a partition when to advance in time and when to solve the problem (ensure that its field variables are in sync with its current time)
+										I'll call this 'advance'
+									</li>
+									<li>we need to map fields between partitions (example: fluid reactions to structural tractions)
+										keeping in mind that the two meshes might not be conforming on the interface
+									</li>
+									<li>apply relaxation (convergence acceleration) on the interface field</li>
+									<li>access earlier states of partitions (required for temporal interpolation)</li>
+									<li>overwrite the interface state as part of the interpolation</li>
+									<li></li>
+									<li>operations that require access to both partitions make the solver unique to the problem at hand => abstract them away</li>
+								</ol>
+							</aside>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="1" style="display: flex;">
+							<div style="margin: 0 5px 0 5px;">
+								<ol style="list-style-type: lower-alpha;">
+									<li>Fetch data from a partition</li>
+									<li>Mutate fetched data</li>
+									<li>Overwrite data in a partition (assignment)</li>
+								</ol>
+							</div>
+							<div style="margin: 0 5px 0 5px;">
+								<table style="border: solid; border-collapse: collapse;">
+									<tr><th>Dataset</th></tr>
+									<tr><td>+ data (array)</td></tr>
+									<tr><td>- fetch</td></tr>
+									<tr><td>- assign</td></tr>
+								</table>
+							</div>
+							<div style="margin: 0 5px 0 5px;">
+								<table style="border: solid; border-collapse: collapse;">
+									<tr><th>DatasetTransfer</th></tr>
+									<tr><td>+ source Datasets</td></tr>
+									<tr><td>- transform</td></tr>
+									<tr><td>+ target Dataset</td></tr>
+								</table>
+							</div>
+							<div style="margin: 0 5px 0 5px;">
+								<img src="assets/feos23/dataset_data_access.svg"/>
+							</div>
+							<aside class="notes">
+								abstractions to replace these operations by: Dataset and DatasetTransfer
+								<ol>Dataset:
+									<li>represents a set of values unique to a partition (eg: displacement, pressure) at a given point in time</li>
+									<li>knows how to fetch its data</li>
+									<li>can be manipulated</li>
+									<li>knows how to assign its data</li>
+								</ol>
+								<ol>DatasetTransfer:
+									<li>represents an operation in terms of Datasets</li>
+									<li>has a set of input datasets</li>
+									<li>uses those inputs to apply a transformation and produce data for a target dataset</li>
+								</ol>
+								Result: each partition (solver) only has to implement IO for its datasets. Transformations as universal.
+								<ol>Examples:
+									<li>simplest example: make a dataset persistent (write from memory to disk) => transform is just a serialization to some file format</li>
+									<li>map a field from one partition to another one: transform is a mapping between the interface meshes
+										(fetch fluid reactions, apply mapping to data, assign mapped data to structural tractions and flip their directions)
+									</li>
+									<li>convergence acceleration: source and target dataset are the same.
+										Transform stores previous data, and uses it to predict further items in the series
+									</li>
+								</ol>
+							</aside>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h1 class="title">Generic Coupled Solver</h1>
+					<div>
+						<img src="assets/feos23/async.svg"/>
+					</div>
+					<div class="r-stack">
+						<div class="fragment current-visible">
+							<ul>
+								<li>Communication between partitions exclusively via <b>DatasetTrasfer</b></li>
+								<li>No communication in <b>Advance</b></li>
+								<li>Communication in <b>Preprocess</b>, <b>Synchronize</b>, <b>Terminate?</b>, and <b>Postprocess</b></li>
+							</ul>
+							<aside class="notes">
+								<ol>
+									<li>Now we have the means of communicating between partitions
+										=> next up, we need a structure to now when we're supposed to do what communication,
+										   and set the rules what can and cannot be done.
+									</li>
+								</ol>
+							</aside>
+						</div>
+						<div class="fragment current-visible">
+							<ul style="margin-bottom: 15px;">
+								<li>Coupling (physical and temporal) takes place in <b>Synchronize</b></li>
+								<li>Solver structure nestable in <b>Synchronize</b></li>
+								<li>Partition layout controls coupling type (decoupled, barely coupled, one-way coupling, strong coupling, etc.)</li>
+								<li>Transformations in <b>DatasetTransfer</b> control the type of interpolation (linear, quadratic, etc.)</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h1 class="title">Generic Coupled Solver - Specializations</h1>
+					<div class="r-stack">
+						<div class="fragment current-visible" data-fragment-index="0" style="display: flex; align-items: center;">
+							<div>
+								<em>Decoupled layout</em>
+								<ul>
+									<li>No communication during solution loop</li>
+									<li>No coupling, no interpolation</li>
+								</ul>
+							</div>
+							<div>
+								<img src="assets/feos23/decoupled.svg"/>
+							</div>
+						</div>
+						<div class="fragment current-visible" data-fragment-index="1">
+							<div>
+								<img src="assets/feos23/hierarchical_simplified.svg"/>
+							</div>
+							<div>
+								<div>
+									<div><em>Hierarchical layout</em></div>
+									<ul>
+										<li><b>B</b> requires data from <b>A</b> to advance</li>
+										<li><b>A</b>=><b>B</b> transfer takes place in <b>Preprocess</b></li>
+										<li>one-way physical coupling: inner <b>Postprocess</b> is empty</li>
+										<li>strong physical coupling: inner <b>Postprocess</b> transfers <b>B</b>=><b>A</b></li>
+										<li>one-way temporal coupling: inner <b>Synchronize</b> reverts <b>B</b></li>
+										<li>strong temporal coupling: inner <b>Synchronize</b> reverts <b>B</b>, outer <b>Synchronize</b> reverts <b>A</b></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h1 class="title">Status and Roadmap</h1>
+					<div style="display: flex; flex-direction: column; justify-items: center; align-items: center;">
+						<div style="display: flex;">
+							<div style="margin: 5px;">
+								<em>Available</em>
+								<hr/>
+								<ul>
+									<li>Communication between partitions</li>
+									<li>Spatial mapping</li>
+									<li>Linear temporal interpolation</li>
+									<li>Checkpointing</li>
+								</ul>
+							</div>
+							<div style="margin: 5px;">
+								<em>In progress</em>
+								<hr/>
+								<ul>
+									<li>Generate reference solution with fine temporal resolution</li>
+									<li>Explore interpolation schemes (including derivatives)</li>
+								</ul>
+							</div>
+							<div style="margin: 5px;">
+								<em>Planned</em>
+								<hr/>
+								<ul>
+									<li>Other FSI cases</li>
+									<li>Other physical coupling schemes</li>
+									<li>Other coupled physics (chemical processes + dynamics + damage)</li>
+								</ul>
+							</div>
+						</div>
+						<div style="width: 30%;">
+							<img src="assets/feos23/kratos_logo.webp"/>
+						</div>
+					</div>
+				</section>
+
+				<section class="ending">
+					<h1>Thank you!</h1>
+				</section>
+
+				<!-- ================ SLIDES END ================ -->
+
+			</div>
+		</div>
+
+		<div id="hidden" style="display: block;">
+			<div class="footer" id="footer">
+				<img class="tubs-logo" src="assets/common/tubs_logo.gif" />
+				<div class="info">
+					<hr class="hr"/>
+					<div class="title">Coupled Systems with Vastly Different Time Scales: Efficient Simulation Strategies and Implementation Aspects</div>
+					<div class="presenter">Máté Kelemen</div>
+				</div>
+				<img class="isd-logo" src="assets/common/isd_logo.svg" />
+				<img class="grk-logo" src="assets/common/grk_2075_logo.png" />
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/zoom/zoom.js"></script>
+		<script>
+			Reveal.initialize({
+				hash: true,
+				slideNumber: 'c/t',
+				minScale: 0.2,
+				maxScale: 100.0,
+				width: 960,
+				height: 700,
+				margin: 0.01,
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealZoom ]
+			});
+			//var footer = $('#footer').html();
+			//if (window.location.search.match( /print-pdf/gi )) {
+			//	Reveal.addEventListener('ready', function(event) {
+			//		$('.slide-background').append(footer);
+			//	});
+			//} else {
+			//	$('div.reveal').append(footer);
+			//}
+		</script>
+	</body>
+</html>

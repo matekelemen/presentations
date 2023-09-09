@@ -1,0 +1,6 @@
+Options -MultiViews
+RewriteEngine on
+RewriteBase /
+
+#redirect to remove the .html extension
+RewriteRule ^(.+)\.html$ $1 [L,NC,R=301]
