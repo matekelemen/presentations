@@ -496,6 +496,36 @@
                     </standard-slide-content>
                 </section>
 
+                <section data-auto-animate>
+                    <h1>Coupling Instabilities</h1>
+                    <standard-slide-content>
+                        <div style="display: flex;
+                                    flex-direction: row;
+                                    align-items: center;
+                                    align-content: center;
+                                    justify-items: center;
+                                    justify-content: center;
+                                    width: 100%;">
+                            <div style="width: 50%;">
+                                <ul>
+                                    <li>No temporal coupling (identical time steps)</li>
+                                    <li>Implicit physical coupling</li>
+                                    <li>Convergence criterion on interface forces</li>
+                                    <li>5 [ms] time step size</li>
+                                    <li>Requires more relaxation</li>
+                                    <li>Requires more coupling iterations</li>
+                                </ul>
+                                <video style="margin: 5px 0 0 0;" data-autoplay="1" src="assets/gacm23/mok_unconverged_explicit_5e-3.mp4"></video>
+                            </div>
+                            <div style="width: 50%;">
+                                <div>
+                                    <img style="margin: 0;" src="assets/gacm23/mok_unconverged_explicit.svg"/>
+                                </div>
+                            </div>
+                        </div>
+                    </standard-slide-content>
+                </section>
+
                 <!-- ================ SLIDES END ================ -->
             </div>
         </div>
