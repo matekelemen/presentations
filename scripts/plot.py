@@ -25,6 +25,12 @@ tickFont = {
     "fontsize" : 16
 }
 
+colors = [numpy.array(rgb) / 255.0 for rgb in (
+    [0, 82, 147],
+    [227, 114, 34],
+    [162, 173, 0]
+)]
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i",
@@ -63,8 +69,8 @@ for input in args.inputs:
     values.append(numpy.fromfile(input))
     samples.append(numpy.linspace(0.0, args.endTime, len(values[-1])))
 
-for x, y in zip(samples, values):
-    pyplot.plot(x, y)
+for i_line, (x, y) in enumerate(zip(samples, values)):
+    pyplot.plot(x, y, color = colors[i_line])
 
 pyplot.legend(args.legend,
               prop = FontProperties(**legendFont))

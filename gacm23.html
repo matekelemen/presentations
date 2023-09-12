@@ -21,12 +21,10 @@
 
                 <section data-auto-animate>
                     <h1>Diverse Time Scales in Multidisciplinary Problems - Challenges in Coupling Procedures and Software Design</h1>
-                    <hr style="border: 1px solid #000000; margin: 2.3em 0 2.3em 0;" />
-                    <div style="margin: 2.3em 0 2.3em 0;">
-                        <h2>Máté Kelemen</h2>
-                        <h2>Institute for Structural Analysis - Technische Universität Braunschweig</h2>
-                        <h3>Supervisors: <div>Prof. Dr.-Ing. habil. Roland Wüchner</div><div>Dr.-Ing. Suneth Warnakulasuriya</div></h3>
-                    </div>
+                    <hr style="border: 1px solid #000000; margin: 2.3em 0 0.5em 0;" />
+                    <h2>Máté Kelemen</h2>
+                    <h2>Institute for Structural Analysis - Technische Universität Braunschweig</h2>
+                    <h3>Supervisors: <div>Prof. Dr.-Ing. habil. Roland Wüchner</div><div>Dr.-Ing. Suneth Warnakulasuriya</div></h3>
                     <aside class="notes">
                     </aside>
                 </section>
@@ -410,9 +408,36 @@
                 </section>
 
                 <section data-auto-animate>
-                    <h1>Solver Framework</h1>
+                    <h1>Abstractions for Coupling</h1>
                     <standard-slide-content>
-
+                        <div style="display: flex;
+                                    flex-direction: row;
+                                    align-content: center;
+                                    align-items: center;
+                                    justify-items: center;
+                                    justify-content: center;">
+                            <div>
+                                <div style="margin: 5px;">
+                                    <table style="border: solid; border-collapse: collapse;">
+                                        <tr><th>Dataset</th></tr>
+                                        <tr><td>+ data (array)</td></tr>
+                                        <tr><td>- fetch</td></tr>
+                                        <tr><td>- assign</td></tr>
+                                    </table>
+                                </div>
+                                <div style="margin: 5px;">
+                                    <table style="border: solid; border-collapse: collapse;">
+                                        <tr><th>DatasetTransfer</th></tr>
+                                        <tr><td>+ source <b>Dataset</b>s</td></tr>
+                                        <tr><td>- transform</td></tr>
+                                        <tr><td>+ target Dataset</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div style="width: 60%; margin: 0;">
+                                <img src="assets/gacm23/async_solver.svg"/>
+                            </div>
+                        </div>
                     </standard-slide-content>
                 </section>
 
@@ -426,17 +451,45 @@
                                     justify-items: center;
                                     justify-content: center;
                                     width: 100%;">
-                            <div style="width: 45%;">
+                            <div style="width: 50%; display: block;">
                                 <ul>
                                     <li>No temporal coupling (identical time steps)</li>
                                     <li>Implicit physical coupling</li>
+                                    <li>Convergence criterion on <span style="color: #e37222;">interface displacement</span></li>
                                     <li>Smaller time steps (100 [ms] <span>&#8594;</span> 5 [ms])</li>
                                 </ul>
+                                <video style="margin: 5px 0 0 0;" class="fragment" data-fragment-index="0" data-autoplay="1" src="assets/gacm23/mok_unconverged_implicit.mp4"></video>
                             </div>
-                            <div style="width: 55%;">
+                            <div style="width: 50%;">
                                 <div>
-                                    <img style="width: 60%; margin: 0;" class="fragment" data-fragment-index="0" src="assets/gacm23/mok_unconverged_implicit_5e-3.svg"/>
-                                    <video style="margin: 0; width: 70%;" class="fragment" data-fragment-index="0" data-autoplay="1" src="assets/gacm23/mok_unconverged_implicit.mp4"></video>
+                                    <img style="margin: 0;" class="fragment" data-fragment-index="0" src="assets/gacm23/mok_unconverged_implicit_5e-3.svg"/>
+                                </div>
+                            </div>
+                        </div>
+                    </standard-slide-content>
+                </section>
+
+                <section data-auto-animate>
+                    <h1>Coupling Instabilities</h1>
+                    <standard-slide-content>
+                        <div style="display: flex;
+                                    flex-direction: row;
+                                    align-items: center;
+                                    align-content: center;
+                                    justify-items: center;
+                                    justify-content: center;
+                                    width: 100%;">
+                            <div style="width: 50%;">
+                                <ul>
+                                    <li>No temporal coupling (identical time steps)</li>
+                                    <li>Explicit physical coupling</li>
+                                    <li>5 [ms] time step size</li>
+                                </ul>
+                                <video style="margin: 5px 0 0 0;" data-autoplay="1" src="assets/gacm23/mok_unconverged_explicit_5e-3.mp4"></video>
+                            </div>
+                            <div style="width: 50%;">
+                                <div>
+                                    <img style="margin: 0;" src="assets/gacm23/mok_unconverged_explicit.svg"/>
                                 </div>
                             </div>
                         </div>
@@ -482,15 +535,15 @@
                                 Diverse time scales in multidisciplinary problems - challenges in coupling procedures and software design
                             </div>
                             <div data-id="footer-presenter" class="presenter" style="text-align: left;">
-                                Máté Kelemen - <a href="https://matekelemen.github.io/presentations/gacm23">matekelemen.github.io/presentations/gacm23</a>
+                                Máté Kelemen
                             </div>
                         </div>
-                        <img class="isd-logo"
-                                src="assets/common/isd_logo.svg"
-                                style="margin: 2px 5px 0 5px;" />
-                        <img class="grk-logo"
-                                src="assets/common/grk_2075_logo.png"
-                                style="margin: 2px 0 0 0;" />
+                        <img src="assets/gacm23/gacm23.png"
+                             style="margin: 2px 5px 0 5px;"/>
+                        <img src="assets/common/isd_logo.svg"
+                             style="margin: 2px 5px 0 5px;" />
+                        <img src="assets/common/grk_2075_logo.png"
+                             style="margin: 2px 0 0 0;" />
                     </div>
                 </div>
             </div>

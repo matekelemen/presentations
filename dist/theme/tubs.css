@@ -405,3 +405,8 @@ standard-slide-content {
     color: var(--r-main-color);
     text-align: center;
 }
+
+video {
+  border: none;
+  outline: none;
+}
