@@ -13,7 +13,7 @@
  :root {
    --r-background-color: #fff;
    --r-main-font: Nexus;
-   --r-main-font-size: 18px;
+   --r-main-font-size: 32px;
    --r-main-color: #222;
    --r-block-margin: 20px;
    --r-heading-margin: 0 0 20px 0;
@@ -379,7 +379,7 @@ figcaption {
 }
 
 standard-slide-content {
-    height: 450px;
+    height: 800px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -397,7 +397,7 @@ standard-slide-content {
 }
 
 .reveal .slide-number {
-    font-size: 1em;
+    font-size: 0.5em;
     right: 10px;
     bottom: 0px;
     width: 90px;
