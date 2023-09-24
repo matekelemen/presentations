@@ -12,7 +12,6 @@
 
         <!-- Theme used for syntax highlighted code -->
         <link rel="stylesheet" href="plugin/highlight/monokai.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     </head>
     <body>
         <div class="reveal">
@@ -607,7 +606,8 @@
                                 justify-content: flex-end;
                                 align-items: top;
                                 height: inherit;
-                                margin: 0 0 0 0;">
+                                margin: 0 0 0 0;
+                                overflow: hidden;">
                         <img class="tubs-logo"
                              src="assets/common/tubs_logo.gif"
                              style="margin: 0 5px 0 0;"/>
@@ -651,16 +651,16 @@
             let width = 960;
             let height = 700;
 
-            $("section").each(function(index, slide) {
-                if ($(slide).children('section').length == 0) {
+            for (let slide of document.getElementsByTagName("section")) {
+                if (Array.from(slide.children).find(child => child.tagName === "SECTION") === undefined) {
                     let footer = document.getElementById("footer-template").cloneNode(true);
                     //reissueIds(footer);
                     footer.style["width"] = `${width}px`;
                     footer.style["height"] = `${0.1 * height}px`;
                     footer.style["visibility"] = "visible";
-                    $(slide).append(footer);
+                    slide.append(footer);
                 }
-            });
+            }
 
             Reveal.initialize({
                 hash: true,
